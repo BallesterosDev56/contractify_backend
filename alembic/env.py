@@ -12,7 +12,7 @@ from sqlalchemy import engine_from_config, pool
 from app.core.config import settings
 from app.core.db import Base
 
-# Import all models to register them with Base.metadata_
+# Import all models to register them with Base.metadata
 from app.modules.users.models import User, UserPreferences, UserSession
 from app.modules.contracts.models import Contract, ContractVersion, ContractParty, ActivityLog
 from app.modules.ai.models import AsyncJob, AICache
@@ -31,8 +31,8 @@ config.set_main_option("sqlalchemy.url", settings.database_url_sync)
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Target metadata_ from Base (only metadata_ is shared, not the engine)
-target_metadata = Base.metadata_
+# Target metadata_ from Base (only metadata is shared, not the engine)
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
