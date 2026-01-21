@@ -153,7 +153,7 @@ async def update_contract(
     service: ContractService = Depends(get_service),
 ) -> Contract:
     """
-    Update contract metadata.
+    Update contract metadata_.
 
     PATCH /contracts/{contractId}
     """

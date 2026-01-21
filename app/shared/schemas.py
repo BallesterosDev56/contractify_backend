@@ -16,7 +16,7 @@ class ErrorResponse(BaseModel):
 
 
 class Pagination(BaseModel):
-    """Pagination metadata matching OpenAPI spec."""
+    """Pagination metadata_ matching OpenAPI spec."""
 
     page: int = Field(ge=1)
     pageSize: int = Field(ge=1, le=100)

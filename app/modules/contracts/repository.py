@@ -225,7 +225,7 @@ class ContractRepository:
             contract_type=original.contract_type,
             owner_user_id=owner_user_id,
             status="DRAFT",
-            metadata=original.metadata_.copy(),
+            metadata_=original.metadata_.copy(),
         )
         self.db.add(new_contract)
         await self.db.flush()

@@ -216,7 +216,7 @@ class ContractService:
         current_user: CurrentUser,
         data: UpdateContractRequest,
     ) -> ContractSchema:
-        """Update contract metadata."""
+        """Update contract metadata_."""
         contract = await self.contract_repo.get_by_id(contract_id)
         if not contract:
             raise NotFoundException("Contract not found")

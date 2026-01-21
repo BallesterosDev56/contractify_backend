@@ -73,7 +73,7 @@ def upgrade() -> None:
         sa.Column('template_id', sa.String(100), nullable=False),
         sa.Column('owner_user_id', sa.String(100), nullable=False, index=True),
         sa.Column('status', sa.String(20), default='DRAFT', nullable=False),
-        sa.Column('metadata', postgresql.JSONB, default={}, nullable=False),
+        sa.Column('metadata_', postgresql.JSONB, default={}, nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
         sa.Column('signed_at', sa.DateTime(timezone=True)),
@@ -151,7 +151,7 @@ def upgrade() -> None:
         sa.Column('id', postgresql.UUID(as_uuid=False), primary_key=True, server_default=sa.text('gen_random_uuid()')),
         sa.Column('cache_key', sa.String(255), unique=True, nullable=False, index=True),
         sa.Column('content', sa.Text, nullable=False),
-        sa.Column('metadata', postgresql.JSONB, default={}),
+        sa.Column('metadata_', postgresql.JSONB, default={}),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('expires_at', sa.DateTime(timezone=True)),
         schema='ai'

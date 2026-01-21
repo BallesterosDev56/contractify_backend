@@ -27,7 +27,7 @@ class AIGenerateRequest(BaseModel):
 
 
 class AIGenerateMetadata(BaseModel):
-    """AI generation metadata."""
+    """AI generation metadata_."""
 
     model: Optional[str] = None
     promptVersion: Optional[str] = None
@@ -39,7 +39,7 @@ class AIGenerateResponse(BaseModel):
 
     content: str = Field(description="Generated HTML content")
     placeholders: Dict[str, str] = {}
-    metadata: Optional[AIGenerateMetadata] = None
+    metadata_: Optional[AIGenerateMetadata] = None
 
 
 class AIRegenerateRequest(BaseModel):

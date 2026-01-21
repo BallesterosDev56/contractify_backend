@@ -247,7 +247,7 @@ class AIService:
             return AIGenerateResponse(
                 content=cached.content,
                 placeholders={},
-                metadata=AIGenerateMetadata(
+                metadata_=AIGenerateMetadata(
                     model="cache",
                     promptVersion="v1",
                     confidenceScore=1.0,
@@ -263,7 +263,7 @@ class AIService:
         return AIGenerateResponse(
             content=content,
             placeholders={},
-            metadata=AIGenerateMetadata(
+            metadata_=AIGenerateMetadata(
                 model="mock-gpt-4",
                 promptVersion="v1.0",
                 confidenceScore=0.95,
@@ -305,7 +305,7 @@ class AIService:
                 {
                     "content": result.content,
                     "placeholders": result.placeholders,
-                    "metadata": result.metadata_.model_dump() if result.metadata_ else None,
+                    "metadata_": result.metadata_.model_dump() if result.metadata_ else None,
                 },
             )
         except Exception as e:
@@ -343,7 +343,7 @@ class AIService:
         return AIGenerateResponse(
             content=content,
             placeholders={},
-            metadata=AIGenerateMetadata(
+            metadata_=AIGenerateMetadata(
                 model="mock-gpt-4",
                 promptVersion="v1.0",
                 confidenceScore=0.90,

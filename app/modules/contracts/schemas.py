@@ -121,7 +121,7 @@ class CreateContractRequest(BaseModel):
 
 
 class UpdateContractRequest(BaseModel):
-    """Update contract metadata - matches OpenAPI UpdateContractRequest."""
+    """Update contract metadata_ - matches OpenAPI UpdateContractRequest."""
 
     title: Optional[str] = None
 
@@ -153,7 +153,7 @@ class AddPartyRequest(BaseModel):
 
 
 class Pagination(BaseModel):
-    """Pagination metadata - matches OpenAPI Pagination."""
+    """Pagination metadata_ - matches OpenAPI Pagination."""
 
     page: int
     pageSize: int

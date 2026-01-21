@@ -44,11 +44,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     # Initialize database (create tables if needed)
     # just the first time
-    # try:
-    #     await init_db()
-    #     print("🗄️ Database initialized")
-    # except Exception as e:
-    #     print(f"⚠️ Database initialization error: {e}")
+    try:
+        await init_db()
+        print("🗄️ Database initialized")
+    except Exception as e:
+        print(f"⚠️ Database initialization error: {e}")
 
     yield
 

@@ -105,14 +105,14 @@ class AICacheRepository:
         self,
         cache_key: str,
         content: str,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata_: Optional[Dict[str, Any]] = None,
         expires_at: Optional[datetime] = None,
     ) -> AICache:
         """Set cached content."""
         cache = AICache(
             cache_key=cache_key,
             content=content,
-            metadata=metadata or {},
+            metadata_=metadata_ or {},
             expires_at=expires_at,
         )
         self.db.add(cache)
