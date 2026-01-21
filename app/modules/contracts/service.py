@@ -109,8 +109,8 @@ class ContractService:
             content=content,
             parties=parties,
             signatures=[],  # Signatures come from signatures module
-            documentUrl=contract.metadata.get("documentUrl"),
-            documentHash=contract.metadata.get("documentHash"),
+            documentUrl=contract.metadata_.get("documentUrl"),
+            documentHash=contract.metadata_.get("documentHash"),
         )
 
     async def _check_ownership(
@@ -543,5 +543,5 @@ class ContractService:
             id=contract.id,
             title=contract.title,
             content=content,
-            documentUrl=contract.metadata.get("documentUrl"),
+            documentUrl=contract.metadata_.get("documentUrl"),
         )
