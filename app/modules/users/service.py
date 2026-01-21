@@ -22,17 +22,59 @@ class UserService:
         self.session_repo = UserSessionRepository(db)
 
     async def get_current_user_profile(self, current_user: CurrentUser) -> UserSchema:
-        """Get or create user profile for authenticated user."""
+        """
+        Get or auto-provision user profile for authenticated Firebase user.
+
+        This method implements auto-provisioning: when a valid Firebase user
+        authenticates but doesn't exist in our database, they are automatically
+        created with their Firebase information.
+
+        Auto-Provisioning Flow:
+        1. Check if user exists in database by Firebase UID
+        2. If exists: return user profile
+        3. If not exists: create user with Firebase data (email, name)
+        4. Handle race conditions for simultaneous logins
+        5. Initialize default preferences and return complete profile
+
+        The method signature remains stable for backward compatibility and
+        future enhancements (roles, permissions, etc.) can be added internally
+        without breaking existing callers.
+
+        Args:
+            current_user: Authenticated Firebase user from JWT token
+
+        Returns:
+            UserSchema: Complete user profile with preferences
+
+        Raises:
+            Exception: If user creation fails (database errors, constraints, etc.)
+        """
+        # Parse Firebase name into first/last name
+        # Handle various name formats: "John", "John Doe", "John Michael Doe"
+        first_name = None
+        last_name = None
+
+        if current_user.name:
+            name_parts = current_user.name.strip().split()
+            if len(name_parts) >= 1:
+                first_name = name_parts[0]
+            if len(name_parts) >= 2:
+                # Join remaining parts as last name (handles middle names)
+                last_name = " ".join(name_parts[1:])
+
+        # Get or create user with auto-provisioning
+        # This handles race conditions internally
         user = await self.user_repo.get_or_create(
             user_id=current_user.id,
             email=current_user.email,
-            first_name=current_user.name.split()[0] if current_user.name else None,
-            last_name=" ".join(current_user.name.split()[1:]) if current_user.name and " " in current_user.name else None,
+            first_name=first_name,
+            last_name=last_name,
         )
 
-        # Get preferences
+        # Get user preferences (returns None if not set)
         prefs = await self.prefs_repo.get(current_user.id)
 
+        # Build and return complete user profile
         return UserSchema(
             id=user.id,
             email=user.email,
