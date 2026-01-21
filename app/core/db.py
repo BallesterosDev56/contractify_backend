@@ -1,42 +1,27 @@
-"""Database configuration with SQLAlchemy 2.0 async.
-
-IMPORTANT: This module is for RUNTIME use only (FastAPI application).
-- Uses ASYNC engine with asyncpg driver (postgresql+asyncpg://)
-- This engine should NEVER be imported by Alembic migrations
-- Alembic has its own SYNC engine configuration (psycopg2)
-"""
-
+import ssl
 from typing import AsyncGenerator
-
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
-
 from .config import settings
 
 
 class Base(DeclarativeBase):
-    """Base class for all SQLAlchemy models.
-
-    Note: Only the Base.metadata is shared with Alembic for migrations.
-    The engine itself is independent.
-    """
-
     pass
 
 
-# Create ASYNC engine for FastAPI runtime
-# Uses asyncpg driver - NOT used by Alembic
-# pool_size=5, max_overflow=0 for Render Free Tier
+# Crear contexto SSL para Render
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False  # Render confía en su certificado
+ssl_context.verify_mode = ssl.CERT_NONE  # No verificar certificado, suficiente para Render
+
+# Engine ASYNC con asyncpg y SSL
 engine = create_async_engine(
     settings.database_url,
     echo=settings.debug,
     pool_pre_ping=True,
     pool_size=5,
-    max_overflow=0,  # No overflow on Render Free to avoid silent failures
+    max_overflow=0,
+    connect_args={"ssl": ssl_context},  # 👈 clave para evitar el error
 )
 
 # Session factory
@@ -50,7 +35,6 @@ AsyncSessionLocal = async_sessionmaker(
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    """Dependency that provides a database session."""
     async with AsyncSessionLocal() as session:
         try:
             yield session
@@ -63,11 +47,9 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db() -> None:
-    """Initialize database tables."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
 
 async def close_db() -> None:
-    """Close database connections."""
     await engine.dispose()
