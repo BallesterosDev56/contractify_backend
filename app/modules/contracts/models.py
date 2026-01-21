@@ -48,7 +48,7 @@ class Contract(Base):
     template_id: Mapped[str] = mapped_column(String(100), nullable=False)
     owner_user_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     status: Mapped[str] = mapped_column(String(20), default="DRAFT", nullable=False)
-    metadata: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
+    metadata_: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
