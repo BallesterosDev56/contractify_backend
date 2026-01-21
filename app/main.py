@@ -43,11 +43,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         print(f"⚠️ Firebase not initialized: {e}")
 
     # Initialize database (create tables if needed)
-    try:
-        await init_db()
-        print("🗄️ Database initialized")
-    except Exception as e:
-        print(f"⚠️ Database initialization error: {e}")
+    # just the first time
+    # try:
+    #     await init_db()
+    #     print("🗄️ Database initialized")
+    # except Exception as e:
+    #     print(f"⚠️ Database initialization error: {e}")
 
     yield
 
