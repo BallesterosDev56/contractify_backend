@@ -56,7 +56,7 @@ class AICache(Base):
     )
     cache_key: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    metadata: Mapped[dict] = mapped_column(JSONB, default=dict)
+    metadata_: Mapped[dict] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

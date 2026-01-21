@@ -305,7 +305,7 @@ class AIService:
                 {
                     "content": result.content,
                     "placeholders": result.placeholders,
-                    "metadata": result.metadata.model_dump() if result.metadata else None,
+                    "metadata": result.metadata_.model_dump() if result.metadata_ else None,
                 },
             )
         except Exception as e:
