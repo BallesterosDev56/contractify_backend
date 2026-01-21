@@ -1,133 +1,217 @@
-# Contractify BFF (Backend for Frontend)
+# Contractify Backend
 
-Backend for Frontend API para la plataforma Contractify. Este servicio actúa como capa de orquestación entre el frontend React y los microservicios backend.
+FastAPI Modular Monolith backend for contract generation, signing, and management.
 
-## 🏗️ Arquitectura
+## Architecture
 
-- **Framework**: Fastify
-- **Lenguaje**: TypeScript
-- **Validación**: Zod
-- **HTTP Client**: Axios
-- **Autenticación**: Firebase Admin SDK
+This backend implements a **Modular Monolith** architecture where each domain is isolated into its own module, but runs in a single process. This allows for:
 
-## 📋 Características
+- Single deployment on Render Free Tier
+- Easy refactoring to microservices in the future
+- Clear domain boundaries
+- No cross-module dependencies
 
-- ✅ Autenticación con Firebase JWT
-- ✅ Validación de requests/responses con Zod
-- ✅ Orquestación de microservicios
-- ✅ Manejo centralizado de errores
-- ✅ Rate limiting
-- ✅ CORS configurado
-- ✅ Logging estructurado
-- ✅ TypeScript estricto
+### Modules
 
-## 🚀 Inicio Rápido
+| Module | Endpoints | Description |
+|--------|-----------|-------------|
+| users | 6 | User management and sessions |
+| contracts | 19 | Contract lifecycle management |
+| templates | 4 | Contract templates and types |
+| ai | 4 | AI-powered generation |
+| documents | 4 | PDF generation and download |
+| signatures | 7 | Digital signature workflows |
+| notifications | 5 | Email and reminders |
+| audit | 2 | Audit trail and compliance |
 
-### Prerrequisitos
+## Quick Start
 
-- Node.js >= 18
-- npm o yarn
+### Prerequisites
 
-### Instalación
+- Python 3.11+
+- PostgreSQL 15+
+- Firebase project (for authentication)
 
-```bash
-npm install
-```
-
-### Configuración
-
-Copia `.env.example` a `.env` y configura las variables:
+### Installation
 
 ```bash
-cp .env.example .env
+# Clone and navigate to backend
+cd contractify_backend
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or: venv\Scripts\activate  # Windows
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-Variables importantes:
-- `FIREBASE_PROJECT_ID`: ID del proyecto Firebase
-- `FIREBASE_PRIVATE_KEY`: Clave privada del servicio de Firebase
-- `FIREBASE_CLIENT_EMAIL`: Email del servicio de Firebase
-- URLs de microservicios
-
-### Desarrollo
+### Database Setup
 
 ```bash
-npm run dev
+# Create PostgreSQL database
+createdb contractify
+
+# Create schemas (run in psql)
+psql -d contractify -c "CREATE SCHEMA IF NOT EXISTS users;"
+psql -d contractify -c "CREATE SCHEMA IF NOT EXISTS contracts;"
+psql -d contractify -c "CREATE SCHEMA IF NOT EXISTS ai;"
+psql -d contractify -c "CREATE SCHEMA IF NOT EXISTS signatures;"
+psql -d contractify -c "CREATE SCHEMA IF NOT EXISTS notifications;"
+psql -d contractify -c "CREATE SCHEMA IF NOT EXISTS audit;"
 ```
 
-El servidor se ejecutará en `http://localhost:3000`
+### Environment Variables
 
-### Producción
+Create a `.env` file:
+
+```env
+# Database
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/contractify
+
+# Firebase (optional for development)
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_PRIVATE_KEY_ID=your-key-id
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk@your-project.iam.gserviceaccount.com
+FIREBASE_CLIENT_ID=123456789
+
+# API Settings
+API_PREFIX=/api
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+DEBUG=true
+```
+
+### Run the Server
 
 ```bash
-npm run build
-npm start
+# Development with hot reload
+uvicorn app.main:app --reload --port 3000
+
+# Production
+uvicorn app.main:app --host 0.0.0.0 --port 3000
 ```
 
-## 📁 Estructura del Proyecto
+The API will be available at:
+- API Base: http://localhost:3000/api
+- Swagger UI: http://localhost:3000/api/docs
+- ReDoc: http://localhost:3000/api/redoc
+
+## Development
+
+### Project Structure
 
 ```
-src/
-├── config/          # Configuración (env, etc.)
-├── middlewares/     # Middlewares (auth, etc.)
-├── routes/          # Rutas organizadas por dominio
-├── schemas/         # Schemas de validación Zod
-├── services/        # Clientes de microservicios
-├── types/           # Definiciones de tipos TypeScript
-├── utils/           # Utilidades (errors, logger, etc.)
-├── app.ts           # Configuración de Fastify
-└── server.ts        # Punto de entrada
+app/
+├── main.py                 # FastAPI application entry point
+├── core/
+│   ├── config.py          # Settings (pydantic-settings)
+│   ├── db.py              # SQLAlchemy 2.0 async setup
+│   └── auth.py            # Firebase JWT validation
+├── shared/
+│   ├── exceptions.py      # Custom exception handlers
+│   └── schemas.py         # Shared Pydantic models
+└── modules/
+    ├── users/             # User management
+    ├── contracts/         # Contract CRUD & lifecycle
+    ├── templates/         # Template management
+    ├── ai/                # AI generation
+    ├── documents/         # PDF generation
+    ├── signatures/        # Digital signatures
+    ├── notifications/     # Email & reminders
+    └── audit/             # Audit trail
 ```
 
-## 🔐 Autenticación
+### Module Structure
 
-El BFF valida tokens JWT de Firebase Authentication. Los requests deben incluir:
+Each module follows the same pattern:
 
 ```
-Authorization: Bearer <token>
+module/
+├── __init__.py           # Exports router
+├── api.py                # FastAPI routes
+├── service.py            # Business logic
+├── repository.py         # Database operations
+├── models.py             # SQLAlchemy models
+└── schemas.py            # Pydantic schemas
 ```
 
-El contexto del usuario se propaga a los microservicios vía headers internos:
-- `X-User-Id`
-- `X-User-Email`
-- `X-User-Role` (si existe)
+### Authentication
 
-## 📚 Endpoints
-
-Todos los endpoints siguen la especificación OpenAPI en `/Users/daniicks-macbook/Downloads/docu.yaml`.
-
-### Principales dominios:
-
-- `/users/*` - Gestión de usuarios
-- `/contracts/*` - Gestión de contratos
-- `/contracts/templates/*` - Plantillas
-- `/ai/*` - Generación con IA
-- `/documents/*` - Generación de PDFs
-- `/signatures/*` - Firmas digitales
-- `/notifications/*` - Notificaciones
-- `/audit/*` - Auditoría
-
-## 🧪 Testing
+The backend validates Firebase JWT tokens. For development, you can use mock tokens:
 
 ```bash
-npm run type-check  # Verificar tipos TypeScript
-npm run lint        # Linter
+# Dev token format: dev_userId_email
+curl -H "Authorization: Bearer dev_123_test@example.com" http://localhost:3000/api/users/me
 ```
 
-## 📝 Notas
+### Testing Endpoints
 
-- El BFF NO contiene lógica de negocio core
-- El BFF NO persiste datos
-- El BFF actúa como orquestador y adaptador
-- Todos los endpoints validan requests contra schemas Zod
-- Los errores se manejan de forma uniforme
+```bash
+# Health check
+curl http://localhost:3000/health
 
-## 🔧 Troubleshooting
+# Get user profile (with auth)
+curl -H "Authorization: Bearer dev_123_test@example.com" \
+  http://localhost:3000/api/users/me
 
-### Error: Firebase configuration is missing
-Verifica que las variables de entorno de Firebase estén configuradas correctamente en `.env`.
+# Create contract
+curl -X POST http://localhost:3000/api/contracts \
+  -H "Authorization: Bearer dev_123_test@example.com" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test Contract","templateId":"tpl_arrendamiento_v1","contractType":"ARRENDAMIENTO_VIVIENDA"}'
 
-### Error: Microservice unreachable
-Verifica que las URLs de los microservicios sean correctas y que estén ejecutándose.
+# Generate contract with AI
+curl -X POST http://localhost:3000/api/ai/generate-contract \
+  -H "Authorization: Bearer dev_123_test@example.com" \
+  -H "Content-Type: application/json" \
+  -d '{"contractId":"<id>","templateId":"tpl_arrendamiento_v1","contractType":"ARRENDAMIENTO_VIVIENDA","inputs":{"arrendador_nombre":"Juan","arrendatario_nombre":"María"}}'
+```
 
-### Error: Port already in use
-Cambia el puerto en `.env` o detén el proceso que está usando el puerto.
+## Deployment (Render)
+
+### render.yaml
+
+```yaml
+services:
+  - type: web
+    name: contractify-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: contractify-db
+          property: connectionString
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: DEBUG
+        value: false
+
+databases:
+  - name: contractify-db
+    plan: free
+```
+
+## API Documentation
+
+The API follows the OpenAPI 3.0 specification defined in `docu.yaml`. All endpoints are prefixed with `/api`.
+
+### Key Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/users/me | Get current user |
+| GET | /api/contracts | List contracts |
+| POST | /api/contracts | Create contract |
+| POST | /api/ai/generate-contract | Generate with AI |
+| POST | /api/signatures/sign | Sign contract |
+| GET | /api/audit/contracts/{id}/trail | Get audit trail |
+
+See `/api/docs` for complete API documentation.
+
+## License
+
+Private - All rights reserved.
