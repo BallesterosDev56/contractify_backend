@@ -44,8 +44,8 @@ async def generate_pdf(
 @router.get("/{documentId}/download")
 async def download_document(
     documentId: str,
-    version: Optional[str] = Query(None),
     current_user: Annotated[CurrentUser, Depends(get_current_user)],
+    version: Optional[str] = Query(None),
     service: DocumentService = Depends(get_service),
 ) -> Response:
     """
