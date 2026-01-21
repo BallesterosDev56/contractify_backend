@@ -1,4 +1,10 @@
-"""Database configuration with SQLAlchemy 2.0 async."""
+"""Database configuration with SQLAlchemy 2.0 async.
+
+IMPORTANT: This module is for RUNTIME use only (FastAPI application).
+- Uses ASYNC engine with asyncpg driver (postgresql+asyncpg://)
+- This engine should NEVER be imported by Alembic migrations
+- Alembic has its own SYNC engine configuration (psycopg2)
+"""
 
 from typing import AsyncGenerator
 
@@ -13,12 +19,17 @@ from .config import settings
 
 
 class Base(DeclarativeBase):
-    """Base class for all SQLAlchemy models."""
+    """Base class for all SQLAlchemy models.
+
+    Note: Only the Base.metadata is shared with Alembic for migrations.
+    The engine itself is independent.
+    """
 
     pass
 
 
-# Create async engine
+# Create ASYNC engine for FastAPI runtime
+# Uses asyncpg driver - NOT used by Alembic
 # pool_size=5, max_overflow=0 for Render Free Tier
 engine = create_async_engine(
     settings.database_url,

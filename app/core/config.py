@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     # Database
     database_url: str
 
+    @property
+    def database_url_sync(self) -> str:
+        """Convert async database URL to sync for Alembic migrations."""
+        # Replace postgresql+asyncpg:// with postgresql:// for psycopg2
+        return self.database_url.replace("postgresql+asyncpg://", "postgresql://")
+
     # CORS
     cors_origins: str
 
