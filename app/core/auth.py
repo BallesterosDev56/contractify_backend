@@ -3,7 +3,7 @@
 from typing import Annotated, Optional
 
 import firebase_admin
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from firebase_admin import auth, credentials
 from pydantic import BaseModel
@@ -44,13 +44,17 @@ security = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
+    request: Request,
     credentials: Annotated[Optional[HTTPAuthorizationCredentials], Depends(security)],
-) -> CurrentUser:
+) -> Optional[CurrentUser]:
     """
     Validate Firebase JWT token and extract user info.
 
     Raises HTTPException 401 if token is invalid or missing.
     """
+    if request.method == "OPTIONS":
+        return None
+
     if credentials is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
