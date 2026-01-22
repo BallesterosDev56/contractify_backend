@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from fastapi import FastAPI
+from fastapi import Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
@@ -80,6 +81,13 @@ app.add_middleware(
     expose_headers=["*"],
     max_age=3600,
 )
+
+# Configure options routes
+@app.middleware("http")
+async def allow_preflight(request: Request, call_next):
+    if request.method == "OPTIONS":
+        return Response(status_code=204)
+    return await call_next(request)
 
 # Register exception handlers
 register_exception_handlers(app)
