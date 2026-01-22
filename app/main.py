@@ -44,11 +44,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     # Initialize database (create tables if needed)
     # just the first time
-    try:
-        await init_db()
-        print("🗄️ Database initialized")
-    except Exception as e:
-        print(f"⚠️ Database initialization error: {e}")
+    # try:
+    #     await init_db()
+    #     print("🗄️ Database initialized")
+    # except Exception as e:
+    #     print(f"⚠️ Database initialization error: {e}")
 
     yield
 
@@ -69,12 +69,16 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Note: CORS middleware must be added before exception handlers
+# to properly handle OPTIONS preflight requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Register exception handlers
