@@ -111,12 +111,12 @@ async def api_health_check():
 # Users module - /api/users/*
 app.include_router(users_router, prefix=settings.api_prefix)
 
-# Contracts module - /api/contracts/*
-app.include_router(contracts_router, prefix=settings.api_prefix)
-
 # Templates module - /api/contracts/templates/*, /api/contracts/types/*
 # Note: Templates routes are defined without prefix in the router to match OpenAPI
 app.include_router(templates_router, prefix=settings.api_prefix)
+
+# Contracts module - /api/contracts/*
+app.include_router(contracts_router, prefix=settings.api_prefix)
 
 # AI module - /api/ai/*
 app.include_router(ai_router, prefix=settings.api_prefix)
